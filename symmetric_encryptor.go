@@ -66,3 +66,7 @@ func (f *SymmetricEncryptor) Encrypt() error {
 
 	return nil
 }
+
+func (f *SymmetricEncryptor) GetKey() [32]byte {
+	return f.key
+}
