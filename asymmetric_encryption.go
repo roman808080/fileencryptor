@@ -22,6 +22,7 @@ func NewRSAEncryptor(key *rsa.PublicKey) *RSAEncryptor {
 }
 
 func (e *RSAEncryptor) Encrypt(input io.Reader, output io.Writer) error {
+	// TODO: Replace io.ReadAll with gob.
 	inputData, err := io.ReadAll(input)
 	if err != nil {
 		return err
@@ -51,6 +52,7 @@ func NewRSADecryptor(key *rsa.PrivateKey) *RSADecryptor {
 }
 
 func (d *RSADecryptor) Decrypt(input io.Reader, output io.Writer) error {
+	// TODO: Replace io.ReadAll with gob.
 	inputData, err := io.ReadAll(input)
 	if err != nil {
 		return err

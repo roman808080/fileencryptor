@@ -53,6 +53,7 @@ func (f *SymmetricDecryptor) Decrypt() error {
 			return err
 		}
 
+		// TODO: Fix this one
 		binary.LittleEndian.PutUint64(nonce[4:], binary.LittleEndian.Uint64(nonce[4:])+1)
 	}
 

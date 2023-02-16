@@ -24,11 +24,13 @@ func NewEncryptor(input io.Reader, output io.Writer, publicKey *rsa.PublicKey, b
 
 func (e *Encryptor) Encrypt() error {
 	// Generate a symmetric key
+	// TODO: Adding injection of a generator to the class
 	key, err := GetSymmetricKey()
 	if err != nil {
 		return err
 	}
 
+	// TODO: Replace with an interface
 	rsaEncryptor := NewRSAEncryptor(e.publicKey)
 
 	// Encrypting a symmetric key
@@ -71,6 +73,7 @@ func (d *Decryptor) Decrypt() error {
 	if err != nil {
 		return err
 	}
+	// TODO: Rewrite the code below
 
 	rsaEncryptor := NewRSAEncryptor(e.publicKey)
 
