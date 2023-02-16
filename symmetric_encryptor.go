@@ -12,10 +12,10 @@ type SymmetricEncryptor struct {
 	in        io.Reader
 	out       io.Writer
 	blockSize int
-	key       [32]byte
+	key       [chacha20poly1305.KeySize]byte
 }
 
-func NewSymmetricEncryptor(in io.Reader, out io.Writer, blockSize int, key [32]byte) (*SymmetricEncryptor, error) {
+func NewSymmetricEncryptor(in io.Reader, out io.Writer, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricEncryptor, error) {
 	return &SymmetricEncryptor{
 		in:        in,
 		out:       out,
@@ -30,7 +30,7 @@ func (f *SymmetricEncryptor) Encrypt() error {
 		return err
 	}
 
-	var nonce [12]byte
+	var nonce [chacha20poly1305.NonceSize]byte
 	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
 		return err
 	}

@@ -11,10 +11,10 @@ type SymmetricDecryptor struct {
 	in        io.Reader
 	out       io.Writer
 	blockSize int
-	key       [32]byte
+	key       [chacha20poly1305.KeySize]byte
 }
 
-func NewSymmetricDecryptor(in io.Reader, out io.Writer, blockSize int, key [32]byte) (*SymmetricDecryptor, error) {
+func NewSymmetricDecryptor(in io.Reader, out io.Writer, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricDecryptor, error) {
 	return &SymmetricDecryptor{
 		in:        in,
 		out:       out,
@@ -29,7 +29,7 @@ func (f *SymmetricDecryptor) Decrypt() error {
 		return err
 	}
 
-	var nonce [12]byte
+	var nonce [chacha20poly1305.NonceSize]byte
 	if err := binary.Read(f.in, binary.LittleEndian, &nonce); err != nil {
 		return err
 	}
