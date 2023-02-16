@@ -15,9 +15,14 @@ func TestFileEncryptor_Encrypt(t *testing.T) {
 	in := bytes.NewBuffer(inputData)
 	out := &bytes.Buffer{}
 
+	key, err := fileencryptor.GetSymmetricKey()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
 	// Create a new FileEncryptor instance
 	blockSize := 5
-	encryptor, err := fileencryptor.NewSymmetricEncryptor(in, out, blockSize)
+	encryptor, err := fileencryptor.NewSymmetricEncryptor(in, out, blockSize, key)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -46,9 +51,14 @@ func TestFileDecryptor_Decrypt(t *testing.T) {
 	forEncryption := bytes.NewBuffer(inputData)
 	forDecryption := &bytes.Buffer{}
 
+	key, err := fileencryptor.GetSymmetricKey()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
 	// Create a new FileEncryptor instance
 	blockSize := 5
-	encryptor, err := fileencryptor.NewSymmetricEncryptor(forEncryption, forDecryption, blockSize)
+	encryptor, err := fileencryptor.NewSymmetricEncryptor(forEncryption, forDecryption, blockSize, key)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -63,7 +73,6 @@ func TestFileDecryptor_Decrypt(t *testing.T) {
 		t.Errorf("output buffer is empty")
 	}
 
-	key := encryptor.GetKey()
 	out := &bytes.Buffer{}
 
 	// Create a new FileDecryptor instance

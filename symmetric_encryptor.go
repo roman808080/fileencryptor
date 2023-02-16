@@ -15,13 +15,7 @@ type SymmetricEncryptor struct {
 	key       [32]byte
 }
 
-func NewSymmetricEncryptor(in io.Reader, out io.Writer, blockSize int) (*SymmetricEncryptor, error) {
-	var key [32]byte
-	_, err := io.ReadFull(rand.Reader, key[:])
-	if err != nil {
-		return nil, err
-	}
-
+func NewSymmetricEncryptor(in io.Reader, out io.Writer, blockSize int, key [32]byte) (*SymmetricEncryptor, error) {
 	return &SymmetricEncryptor{
 		in:        in,
 		out:       out,
@@ -65,8 +59,4 @@ func (f *SymmetricEncryptor) Encrypt() error {
 	}
 
 	return nil
-}
-
-func (f *SymmetricEncryptor) GetKey() [32]byte {
-	return f.key
 }
