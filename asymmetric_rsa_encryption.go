@@ -8,15 +8,15 @@ import (
 
 const defaultPermissions = 0644
 
-type AsymmetricEncryptor struct {
+type RSAEncryptor struct {
 	key *rsa.PublicKey
 }
 
-func NewAsymmetricEncryptor(key *rsa.PublicKey) *AsymmetricEncryptor {
-	return &AsymmetricEncryptor{key: key}
+func NewRSAEncryptor(key *rsa.PublicKey) *RSAEncryptor {
+	return &RSAEncryptor{key: key}
 }
 
-func (e *AsymmetricEncryptor) Encrypt(input io.Reader, output io.Writer) error {
+func (e *RSAEncryptor) Encrypt(input io.Reader, output io.Writer) error {
 	inputData, err := io.ReadAll(input)
 	if err != nil {
 		return err
@@ -34,15 +34,15 @@ func (e *AsymmetricEncryptor) Encrypt(input io.Reader, output io.Writer) error {
 	return nil
 }
 
-type AsymmetricDecryptor struct {
+type RSADecryptor struct {
 	key *rsa.PrivateKey
 }
 
-func NewAsymmetricDecryptor(key *rsa.PrivateKey) *AsymmetricDecryptor {
-	return &AsymmetricDecryptor{key: key}
+func NewRSADecryptor(key *rsa.PrivateKey) *RSADecryptor {
+	return &RSADecryptor{key: key}
 }
 
-func (d *AsymmetricDecryptor) Decrypt(input io.Reader, output io.Writer) error {
+func (d *RSADecryptor) Decrypt(input io.Reader, output io.Writer) error {
 	inputData, err := io.ReadAll(input)
 	if err != nil {
 		return err

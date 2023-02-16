@@ -17,8 +17,8 @@ func TestAsymmetricEncryptionAndDecryption(t *testing.T) {
 	}
 
 	// Create a new AsymmetricEncryptor and AsymmetricDecryptor
-	encryptor := fileencryptor.NewAsymmetricEncryptor(&key.PublicKey)
-	decryptor := fileencryptor.NewAsymmetricDecryptor(key)
+	encryptor := fileencryptor.NewRSAEncryptor(&key.PublicKey)
+	decryptor := fileencryptor.NewRSADecryptor(key)
 
 	// Test data to encrypt and decrypt
 	data := []byte("Hello, world!")
