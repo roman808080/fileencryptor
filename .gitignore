@@ -1,0 +1,4 @@
+*.key
+*.pem
+*.shrc
+*.shrc_enc
