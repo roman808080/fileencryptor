@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"encoding/gob"
 	"hash"
 	"io"
 )
@@ -22,7 +23,7 @@ func NewRSAEncryptor(key *rsa.PublicKey) *RSAEncryptor {
 }
 
 func (e *RSAEncryptor) Encrypt(input io.Reader, output io.Writer) error {
-	// TODO: Replace io.ReadAll with gob.
+	// TODO: Read all content from io.Reader, not nice
 	inputData, err := io.ReadAll(input)
 	if err != nil {
 		return err
@@ -33,7 +34,9 @@ func (e *RSAEncryptor) Encrypt(input io.Reader, output io.Writer) error {
 		return err
 	}
 
-	if _, err := output.Write(cipherText); err != nil {
+	enc := gob.NewEncoder(output)
+	err = enc.Encode(cipherText)
+	if err != nil {
 		return err
 	}
 
@@ -52,13 +55,15 @@ func NewRSADecryptor(key *rsa.PrivateKey) *RSADecryptor {
 }
 
 func (d *RSADecryptor) Decrypt(input io.Reader, output io.Writer) error {
-	// TODO: Replace io.ReadAll with gob.
-	inputData, err := io.ReadAll(input)
+	var encryptedMessage []byte
+	dec := gob.NewDecoder(input)
+
+	err := dec.Decode(&encryptedMessage)
 	if err != nil {
 		return err
 	}
 
-	plainText, err := rsa.DecryptOAEP(d.hash, rand.Reader, d.key, inputData, nil)
+	plainText, err := rsa.DecryptOAEP(d.hash, rand.Reader, d.key, encryptedMessage, nil)
 	if err != nil {
 		return err
 	}
