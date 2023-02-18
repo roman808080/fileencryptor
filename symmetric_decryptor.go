@@ -49,6 +49,7 @@ func (f *SymmetricDecryptor) Decrypt() error {
 			return err
 		}
 
+		// add gob here
 		if _, err := f.out.Write(plaintext); err != nil {
 			return err
 		}

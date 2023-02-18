@@ -51,6 +51,7 @@ func (f *SymmetricEncryptor) Encrypt() error {
 
 		encrypted := aead.Seal(nil, nonce[:], buf[:n], nil)
 
+		// TODO: add gob here
 		if _, err := f.out.Write(encrypted); err != nil {
 			return err
 		}
