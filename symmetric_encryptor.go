@@ -10,12 +10,12 @@ import (
 
 type SymmetricEncryptor struct {
 	in        io.Reader
-	out       io.Writer
+	out       BinaryWriter
 	blockSize int
 	key       [chacha20poly1305.KeySize]byte
 }
 
-func NewSymmetricEncryptor(in io.Reader, out io.Writer, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricEncryptor, error) {
+func NewSymmetricEncryptor(in io.Reader, out BinaryWriter, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricEncryptor, error) {
 	return &SymmetricEncryptor{
 		in:        in,
 		out:       out,
@@ -35,7 +35,7 @@ func (f *SymmetricEncryptor) Encrypt() error {
 		return err
 	}
 
-	if err := binary.Write(f.out, binary.LittleEndian, nonce); err != nil {
+	if err := f.out.Write(nonce); err != nil {
 		return err
 	}
 
@@ -51,8 +51,7 @@ func (f *SymmetricEncryptor) Encrypt() error {
 
 		encrypted := aead.Seal(nil, nonce[:], buf[:n], nil)
 
-		// TODO: add gob here
-		if _, err := f.out.Write(encrypted); err != nil {
+		if err := f.out.Write(encrypted); err != nil {
 			return err
 		}
 

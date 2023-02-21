@@ -7,49 +7,14 @@ import (
 	"github.com/roman808080/fileencryptor"
 )
 
-func TestFileEncryptor_Encrypt(t *testing.T) {
-	// Create some input data
-	inputData := []byte("hello world")
-
-	// Create input and output buffers
-	in := bytes.NewBuffer(inputData)
-	out := &bytes.Buffer{}
-
-	key, err := fileencryptor.GetSymmetricKey()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	// Create a new FileEncryptor instance
-	blockSize := 5
-	encryptor, err := fileencryptor.NewSymmetricEncryptor(in, out, blockSize, key)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	// Call the Encrypt method to encrypt the data
-	if err := encryptor.Encrypt(); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	// Verify that the encrypted data has been written to the output buffer
-	if out.Len() == 0 {
-		t.Errorf("output buffer is empty")
-	}
-
-	// Verify that the encrypted data has the correct length
-	if out.Len() != len(inputData)+12+(len(inputData)+blockSize-1)/blockSize*16 {
-		t.Errorf("unexpected output length: %d", out.Len())
-	}
-}
-
-func TestFileDecryptor_Decrypt(t *testing.T) {
+func TestSymmetricEncryption(t *testing.T) {
 	// Create some input data
 	inputData := []byte("hello world")
 
 	// Create input and output buffers
 	forEncryption := bytes.NewBuffer(inputData)
 	forDecryption := &bytes.Buffer{}
+	gobWriter := fileencryptor.NewGobWriter(forDecryption)
 
 	key, err := fileencryptor.GetSymmetricKey()
 	if err != nil {
@@ -58,7 +23,7 @@ func TestFileDecryptor_Decrypt(t *testing.T) {
 
 	// Create a new FileEncryptor instance
 	blockSize := 5
-	encryptor, err := fileencryptor.NewSymmetricEncryptor(forEncryption, forDecryption, blockSize, key)
+	encryptor, err := fileencryptor.NewSymmetricEncryptor(forEncryption, gobWriter, blockSize, key)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -72,11 +37,12 @@ func TestFileDecryptor_Decrypt(t *testing.T) {
 	if forDecryption.Len() == 0 {
 		t.Errorf("output buffer is empty")
 	}
+	gobReader := fileencryptor.NewGobReader(forDecryption)
 
 	out := &bytes.Buffer{}
 
 	// Create a new FileDecryptor instance
-	decryptor, err := fileencryptor.NewSymmetricDecryptor(forDecryption, out, blockSize, key)
+	decryptor, err := fileencryptor.NewSymmetricDecryptor(gobReader, out, blockSize, key)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

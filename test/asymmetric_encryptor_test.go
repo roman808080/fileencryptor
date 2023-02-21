@@ -26,9 +26,10 @@ func TestAsymmetricEncryptionAndDecryption(t *testing.T) {
 	// Create a buffer for the input and output data
 	input := bytes.NewBuffer(data)
 	output := new(bytes.Buffer)
+	gobWriter := fileencryptor.NewGobWriter(output)
 
 	// Encrypt the data using the encryptor
-	err = encryptor.Encrypt(input, output)
+	err = encryptor.Encrypt(input, gobWriter)
 	if err != nil {
 		t.Fatalf("Failed to encrypt data: %v", err)
 	}
@@ -37,7 +38,9 @@ func TestAsymmetricEncryptionAndDecryption(t *testing.T) {
 	input.Reset()
 	input.Write(output.Bytes()) // Set the encrypted data as the new input
 	output.Reset()              // Reset the output buffer
-	err = decryptor.Decrypt(input, output)
+
+	gobReader := fileencryptor.NewGobReader(input)
+	err = decryptor.Decrypt(gobReader, output)
 	if err != nil {
 		t.Fatalf("Failed to decrypt data: %v", err)
 	}
@@ -65,9 +68,10 @@ func TestAsymmetricEncryptionAndDecryptionAdditionalBytes(t *testing.T) {
 	// Create a buffer for the input and output data
 	input := bytes.NewBuffer(data)
 	output := new(bytes.Buffer)
+	gobWriter := fileencryptor.NewGobWriter(output)
 
 	// Encrypt the data using the encryptor
-	err = encryptor.Encrypt(input, output)
+	err = encryptor.Encrypt(input, gobWriter)
 	if err != nil {
 		t.Fatalf("Failed to encrypt data: %v", err)
 	}
@@ -82,7 +86,9 @@ func TestAsymmetricEncryptionAndDecryptionAdditionalBytes(t *testing.T) {
 	input.Reset()
 	input.Write(output.Bytes()) // Set the encrypted data as the new input
 	output.Reset()              // Reset the output buffer
-	err = decryptor.Decrypt(input, output)
+
+	gobReader := fileencryptor.NewGobReader(input)
+	err = decryptor.Decrypt(gobReader, output)
 	if err != nil {
 		t.Fatalf("Failed to decrypt data: %v", err)
 	}

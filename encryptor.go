@@ -32,20 +32,20 @@ func (e *Encryptor) Encrypt() error {
 		return err
 	}
 
+	gobWriter := NewGobWriter(e.output)
+
 	// TODO: Replace with an interface
 	rsaEncryptor := NewRSAEncryptor(e.publicKey)
 
 	// Encrypting a symmetric key
 	reader := bytes.NewReader(key[:])
-	err = rsaEncryptor.Encrypt(reader, e.output)
+	err = rsaEncryptor.Encrypt(reader, gobWriter)
 	if err != nil {
 		return err
 	}
 
-	// TODO: Add a custom block size
-
 	// Encrypt a file with the generated symmetric key
-	symEnc, err := NewSymmetricEncryptor(e.input, e.output, e.blockSize, key)
+	symEnc, err := NewSymmetricEncryptor(e.input, gobWriter, e.blockSize, key)
 	if err != nil {
 		return err
 	}
@@ -71,17 +71,18 @@ func NewDecryptor(input io.Reader, output io.Writer, privateKey *rsa.PrivateKey,
 
 func (d *Decryptor) Decrypt() error {
 	rsaDecryptor := NewRSADecryptor(d.privateKey)
+	gobReader := NewGobReader(d.input)
 
 	// A buffer where the symmetric key will be stored
 	decryptedKeyBuffer := new(bytes.Buffer)
-	err := rsaDecryptor.Decrypt(d.input, decryptedKeyBuffer)
+	err := rsaDecryptor.Decrypt(gobReader, decryptedKeyBuffer)
 	if err != nil {
 		return err
 	}
 
 	// Creating a new decryptor
 	symDec, err := NewSymmetricDecryptor(
-		d.input, d.output, d.blockSize,
+		gobReader, d.output, d.blockSize,
 		[chacha20poly1305.KeySize]byte(decryptedKeyBuffer.Bytes()))
 
 	if err != nil {

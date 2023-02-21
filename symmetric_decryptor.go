@@ -8,13 +8,13 @@ import (
 )
 
 type SymmetricDecryptor struct {
-	in        io.Reader
+	in        BinaryReader
 	out       io.Writer
 	blockSize int
 	key       [chacha20poly1305.KeySize]byte
 }
 
-func NewSymmetricDecryptor(in io.Reader, out io.Writer, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricDecryptor, error) {
+func NewSymmetricDecryptor(in BinaryReader, out io.Writer, blockSize int, key [chacha20poly1305.KeySize]byte) (*SymmetricDecryptor, error) {
 	return &SymmetricDecryptor{
 		in:        in,
 		out:       out,
@@ -30,13 +30,13 @@ func (f *SymmetricDecryptor) Decrypt() error {
 	}
 
 	var nonce [chacha20poly1305.NonceSize]byte
-	if err := binary.Read(f.in, binary.LittleEndian, &nonce); err != nil {
+	if err := f.in.Read(&nonce); err != nil {
 		return err
 	}
 
-	buf := make([]byte, f.blockSize+aead.Overhead())
 	for {
-		n, err := f.in.Read(buf)
+		var buf []byte
+		err := f.in.Read(&buf)
 		if err == io.EOF {
 			break
 		}
@@ -44,7 +44,7 @@ func (f *SymmetricDecryptor) Decrypt() error {
 			return err
 		}
 
-		plaintext, err := aead.Open(nil, nonce[:], buf[:n], nil)
+		plaintext, err := aead.Open(nil, nonce[:], buf, nil)
 		if err != nil {
 			return err
 		}
