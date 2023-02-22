@@ -20,12 +20,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer inputStream.Close()
 
 	outputStream, err := os.Create(*output)
 	if err != nil {
 		panic(err)
 	}
+	defer outputStream.Close()
 
+	blockSize := 32 * 1024
 	if *keyPath != "" {
 		keyBytes, err := ioutil.ReadFile(*keyPath)
 		if err != nil {
@@ -37,7 +40,7 @@ func main() {
 			panic(err)
 		}
 
-		fileDecryptror := fileencryptor.NewDecryptor(inputStream, outputStream, rsaKey, 1024)
+		fileDecryptror := fileencryptor.NewDecryptor(inputStream, outputStream, rsaKey, blockSize)
 		err = fileDecryptror.Decrypt()
 		if err != nil {
 			panic(err)
@@ -55,7 +58,7 @@ func main() {
 			panic(err)
 		}
 
-		enc := fileencryptor.NewEncryptor(inputStream, outputStream, rsaPublicKey, 1024)
+		enc := fileencryptor.NewEncryptor(inputStream, outputStream, rsaPublicKey, blockSize)
 		err = enc.Encrypt()
 		if err != nil {
 			panic(err)
